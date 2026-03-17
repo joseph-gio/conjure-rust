@@ -23,12 +23,11 @@ use conjure_error::Error;
 use http::{Request, Response};
 use http_body::{Body, Frame, SizeHint};
 use hyper::body::Incoming;
-use hyper_rustls::{HttpsConnector, HttpsConnectorBuilder};
+use hyper_rustls::{ConfigBuilderExt, HttpsConnector, HttpsConnectorBuilder};
 use hyper_util::client::legacy::connect::HttpConnector;
 use hyper_util::client::legacy::{self, Client};
 use hyper_util::rt::{TokioExecutor, TokioTimer};
 use pin_project::pin_project;
-use rustls::crypto::ring;
 use rustls::pki_types::{CertificateDer, PrivateKeyDer};
 use rustls::{ClientConfig, RootCertStore};
 use rustls_pemfile::Item;
@@ -37,7 +36,6 @@ use std::io::BufReader;
 use std::marker::PhantomPinned;
 use std::path::Path;
 use std::pin::Pin;
-use std::sync::Arc;
 use std::task::{Context, Poll};
 use std::time::Duration;
 use tower_layer::Layer;
@@ -71,10 +69,12 @@ impl RawClient {
             let certs = load_certs_file(ca_file)?;
             roots.add_parsable_certificates(certs);
         }
-        let client_config = ClientConfig::builder_with_provider(Arc::new(ring::default_provider()))
-            .with_safe_default_protocol_versions()
-            .map_err(Error::internal_safe)?
-            .with_root_certificates(roots);
+        let client_config =
+            ClientConfig::builder_with_provider(crate::crypto::ring_crypto_provider().clone())
+                .with_safe_default_protocol_versions()
+                .map_err(Error::internal_safe)?
+                .try_with_platform_verifier()
+                .map_err(Error::internal_safe)?;
 
         let client_config = match (
             builder.get_security().cert_file(),

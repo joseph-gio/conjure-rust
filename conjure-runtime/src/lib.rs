@@ -216,6 +216,8 @@ mod body;
 pub mod builder;
 mod client;
 pub mod client_factory;
+/// docs
+pub mod crypto;
 pub mod errors;
 mod host_metrics;
 pub mod per_host_clients;
