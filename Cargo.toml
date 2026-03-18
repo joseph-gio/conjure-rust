@@ -3,13 +3,7 @@ version = "7.3.0"
 
 [workspace]
 resolver = "2"
-members = [
-    "conjure-runtime-config",
-    "conjure-runtime",
-    "conjure-runtime-wasm-test",
-    "conjure-verification",
-    "conjure-verification-api",
-]
+members = ["conjure-runtime"]
 
 [profile.release]
 debug = 1
