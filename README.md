@@ -1,3 +1,7 @@
+# conjure-runtime-rustls-platform-verifier
+
+This is a fork of `conjure-runtime` from Palantir that uses `rustls-platform-verifier` for TLS.
+
 <p align="right">
 <a href="https://autorelease.general.dmz.palantir.tech/palantir/conjure-rust-runtime"><img src="https://img.shields.io/badge/Perform%20an-Autorelease-success.svg" alt="Autorelease"></a>
 </p>
