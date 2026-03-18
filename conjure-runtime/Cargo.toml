@@ -5,7 +5,7 @@ authors = ["Steven Fackler <sfackler@palantir.com>"]
 edition = "2018"
 license = "Apache-2.0"
 description = "An HTTP client compatible with Conjure-generated services"
-repository = "https://github.com/palantir/conjure-rust-runtime"
+repository = "https://github.com/joseph-gio/conjure-rust"
 readme = "../README.md"
 
 [features]
