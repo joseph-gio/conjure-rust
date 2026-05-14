@@ -126,6 +126,7 @@ impl ClientFactory<UserAgentStage> {
                     #[cfg(not(target_arch = "wasm32"))]
                     blocking_handle: None,
                     conjure_runtime: Arc::new(ConjureRuntime::new()),
+                    client_cert_resolver: None,
                 },
                 cache: WeakCache::new(STATE_CACHE_CAPACITY),
             },
