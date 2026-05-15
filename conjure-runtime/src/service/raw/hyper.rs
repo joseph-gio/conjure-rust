@@ -79,8 +79,9 @@ impl RawClient {
         let client_config = match (
             builder.get_security().cert_file(),
             builder.get_security().key_file(),
+            builder.get_client_cert_resolver(),
         ) {
-            (Some(cert_file), Some(key_file)) => {
+            (Some(cert_file), Some(key_file), None) => {
                 let cert_chain = load_certs_file(cert_file)?;
                 let private_key = load_private_key(key_file)?;
 
@@ -88,11 +89,14 @@ impl RawClient {
                     .with_client_auth_cert(cert_chain, private_key)
                     .map_err(Error::internal_safe)?
             }
-            (None, None) => client_config.with_no_client_auth(),
+            (None, None, Some(resolver)) => {
+                client_config.with_client_cert_resolver(resolver.clone())
+            }
+            (None, None, None) => client_config.with_no_client_auth(),
             _ => {
                 return Err(Error::internal_safe(
-                    "neither or both of key-file and cert-file must be set in the client \
-                    security config",
+                    "at most one of (cert-file + key-file) or client-cert-resolver must be \
+                    set in the client security config",
                 ));
             }
         };

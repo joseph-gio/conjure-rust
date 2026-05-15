@@ -21,6 +21,7 @@ use crate::{Client, HostMetricsRegistry, UserAgent};
 use arc_swap::ArcSwap;
 use conjure_error::Error;
 use conjure_http::client::ConjureRuntime;
+use rustls::client::ResolvesClientCert;
 use std::borrow::Cow;
 use std::sync::Arc;
 use std::time::Duration;
@@ -69,6 +70,7 @@ pub(crate) struct UncachedConfig {
     #[cfg(not(target_arch = "wasm32"))]
     pub(crate) blocking_handle: Option<Handle>,
     pub(crate) conjure_runtime: Arc<ConjureRuntime>,
+    pub(crate) client_cert_resolver: Option<Arc<dyn ResolvesClientCert>>,
 }
 
 /// The complete builder stage.
@@ -131,6 +133,7 @@ impl Builder<UserAgentStage> {
                 #[cfg(not(target_arch = "wasm32"))]
                 blocking_handle: None,
                 conjure_runtime: Arc::new(ConjureRuntime::new()),
+                client_cert_resolver: None,
             },
         })
     }
@@ -458,6 +461,21 @@ impl Builder<Complete> {
     /// Returns the configured Conjure runtime.
     pub fn get_conjure_runtime(&self) -> &Arc<ConjureRuntime> {
         &self.0.uncached.conjure_runtime
+    }
+
+    /// Sets the client certificate resolver for mTLS connections.
+    ///
+    /// Mutually exclusive with `cert_file`/`key_file`. Defaults to no client certificate.
+    #[inline]
+    pub fn client_cert_resolver(mut self, resolver: Arc<dyn ResolvesClientCert>) -> Self {
+        self.0.uncached.client_cert_resolver = Some(resolver);
+        self
+    }
+
+    /// Returns the configured client certificate resolver.
+    #[inline]
+    pub fn get_client_cert_resolver(&self) -> Option<&Arc<dyn ResolvesClientCert>> {
+        self.0.uncached.client_cert_resolver.as_ref()
     }
 
     /// Overrides the `hostIndex` field included in metrics.
