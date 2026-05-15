@@ -463,10 +463,9 @@ impl Builder<Complete> {
         &self.0.uncached.conjure_runtime
     }
 
-    /// Sets the client certificate resolver used to resolve client certificates for mTLS connections.
+    /// Sets the client certificate resolver for mTLS connections.
     ///
-    /// Defaults to no resolver (i.e. no client certificate will be used for mTLS connections).
-    /// When set, this resolver will be used to resolve client certificates for mTLS connections.
+    /// Mutually exclusive with `cert_file`/`key_file`. Defaults to no client certificate.
     #[inline]
     pub fn client_cert_resolver(mut self, resolver: Arc<dyn ResolvesClientCert>) -> Self {
         self.0.uncached.client_cert_resolver = Some(resolver);
